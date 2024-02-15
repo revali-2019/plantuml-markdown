@@ -65,4 +65,13 @@ Rel(oracle, fanflow, "Transmit Events")
 
 SHOW_FLOATING_LEGEND()
 
+nextpage
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+Boundary(oracle1, "Oracle SaaS and PaaS", "Oracle Fusion Apps and Paas"){ 
+    System_Ext(fusion1, "Fusion", "Order Management, Procurement, etc")
+    System_Ext(oic1, "OIC", "Oracle Integration Cloud" )
+    System_Ext(oci1, "OCI", "Oracle Functions / Apps etc")
+}
+
+
 @enduml
