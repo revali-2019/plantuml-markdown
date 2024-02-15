@@ -1,10 +1,69 @@
-@startuml
-actor client
-node app
-node car
-node tshirt
+@startuml PLOT
+' !include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include <C4/C4_Container>
 
-car -> app
-app -> client
-client -> tshirt
+title PLatform Observability Tool - PLOT
+Person(p1, "Tech Support - Level 1", "View, Query, Filter Business Events and Exceptions. \n Answer Questions like WISMO?")
+Person(p2, "Tech Support - Level 2", "Additonally to Level 1, can also respond with remedial actions", person2)
+
+
+Boundary(plotBoundary, "Observability Tool", "Review and Respond to Business Events and Exceptions") {
+    Person(robot, "AutoResolver", "Learning and resolving issues", robot)
+    System(plot, "Observability tool", "Contains business events like Sales Order Events, Customer Order Events, Shipping Events, etc \n Contains Exception Events and Success Events")
+    SystemDb(plotdb, "Record Actions", "Record remedial actions and maintain logging")
+    Lay_R(plot, robot)
+    Lay_L(plot, plotdb)
+}
+
+Boundary(fanflowaws, "Fanflow ANA Region", "Business Events Platform") { 
+    Container(fanflow, "Fanflow Platform")
+}
+
+
+Rel(p1, plot, "Level 1 Support", "Monitor and triage")
+Rel(p2, plot, "Level 2 Support", "Respond and Resolve")
+BiRel_U(fanflow, plot, "Collate all events")
+
+Boundary(aws, "AWS Sources", "Boundary Systems within AWS Platform") {
+    System_Ext(lineup, "Lineup", "product life cycle management - Create and update lineplan, products, styles, etc")
+    System_Ext(enovia, "Enovia", "Manage bill of materials")
+    System_Ext(ove, "OVE", "Basic Customer Order Validation and ensures clean Sales Order creation")
+    System_Ext(firefly, "Firefly", "3PD Business Events")
+}
+Lay_D(fanflow, aws)
+Rel(aws, fanflow, "Transmit Events")
+
+Boundary(onprem, "On Prem", "IAD Infra based applications") { 
+    System_Ext(edi, "EDI", "Customer PO Capture via X12 and EDIFACT")
+}
+Lay_D(fanflow, onprem)
+Rel(onprem, fanflow, "Transmit Events")
+
+Boundary(salesforce, "B2B Salesforce Portal", "B2B Portal - Salesforce Managed"){ 
+    System_Ext(b2b, "Salesforce B2B", "Web Portal Customer Order Capture")
+}
+
+Lay_D(fanflow, salesforce)
+Rel(salesforce, fanflow, "Transmit Events")
+
+Boundary(legacy, "Legacy FMS/WMS/DMS", "Legacy Systems hosted on IBM Cloud"){ 
+    System_Ext(fms, "FMS", "Sales Order / Work Order Management")
+    System_Ext(wms, "WMS", "Work Order Management / Warehouse Management" )
+    System_Ext(dms, "DMS", "Delivery Management / Shipping etc")
+}
+
+Lay_D(fanflow, legacy)
+Rel(legacy, fanflow, "Transmit Events")
+
+Boundary(oracle, "Oracle SaaS and PaaS", "Oracle Fusion Apps and Paas"){ 
+    System_Ext(fusion, "Fusion", "Order Management, Procurement, etc")
+    System_Ext(oic, "OIC", "Oracle Integration Cloud" )
+    System_Ext(oci, "OCI", "Oracle Functions / Apps etc")
+}
+
+Lay_D(fanflow, oracle)
+Rel(oracle, fanflow, "Transmit Events")
+
+SHOW_FLOATING_LEGEND()
+
 @enduml
